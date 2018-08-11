@@ -31,5 +31,4 @@ VALUES
   (11, 'kitten_health_nibs', 'treats', 4, 5.43, 24, 130.32, ''),
   (12, 'alisons_shoes', 'treats', 4, 100.01, 1, 100.01, '')
 
-SELECT *
-FROM productsDB;
+SELECT * FROM productsDB;
