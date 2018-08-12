@@ -16,19 +16,20 @@ var connection = mysql.createConnection({
   database: "bamazon"
 });
 
-connection.connect(function (err) {
-  if (err) throw err;
-  console.log("connected as id " + connection.threadId + "\n");
-  start();
-});
+function start() {
+  connection.connect(function (err) {
+    if (err) throw err;
+    console.log("connected as id " + connection.threadId + "\n");
+    start();
+  })
+}
 
 function promptShop() {
-  connection.query("SELECT * FROM productsDB", function(err, results) {
+  connection.query("SELECT * FROM productsDB", function (err, results) {
     if (err) throw err;
     console.log("------------");
     inquirer
-      .prompt([
-        {
+      .prompt([{
           name: "choice",
           type: "rawlist",
           choices: function () {
@@ -47,37 +48,30 @@ function promptShop() {
         }
       ])
       .then(function (answer) {
-      //get database deets on chosen item 
+        //get database deets on chosen item 
         var ShoppingCart;
-        for (var i = 0; i < resizeBy.length; i++) {
+        for (var i = 0; i < results.length; i++) {
           if (results[i].item_ID === answer.choice) {
             ShoppingCart = results[i];
           }
         }
-  
-          //determine if chosen Item is in stock
-          if (ShoppingCart.stock_quantity > parseInt(answer.choiceQuantity)) {
-            //subtract from stock_quantity 
-            connection.query(
-              "UPDATE productsDB SET ? WHERE ?",
-              [
-                {
-                  stock_quantity: stock_quantity - answer.choiceQuantity
-                },
-                {
-                  item_ID: ShoppingCart.item_ID
-                },
-              ],
-              function (error) {
-                if (error) throw err;
-                console.log("TRANSACTION COMPLETE!")
-                start();
-              }
-            );
-          } else {
-            console.log("sorry we don't have enough in stock.");
-            start();
-          }
-        });
+
+        //determine if chosen Item is in stock
+        if (ShoppingCart.stock_quantity > parseInt(answer.choiceQuantity)) {
+          //subtract from stock_quantity 
+          connection.query(
+            //this needs to be fixed
+            "UPDATE `bamazon`.`productsDB` SET `stock_quantity` = 'stock_quantity' WHERE (`item_id` = '9')",
+            function (error) {
+              if (error) throw err;
+              console.log("TRANSACTION COMPLETE!")
+              start();
+            }
+          );
+        } else {
+          console.log("sorry we don't have enough in stock.");
+          start();
+        }
       });
-  }
+  });
+}
